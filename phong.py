@@ -158,15 +158,16 @@ def get_phones():
     global miki_phone_present, other_phone_present
     while True:
         try:
-            phones = json.loads(subprocess.run(["bash", "./phone_list.sh"], stdout=subprocess.PIPE).stdout)
+            lines = str(subprocess.run(["ioreg", "-p", "IOUSB"], stdout=subprocess.PIPE).stdout, encoding="utf-8").split("\n")
         except:
+            print("Splitting `ioreg -p IOUSB` by line failed.")
             continue
         miki_phone_present_tmp = False
         other_phone_present_tmp = False
-        for phone in phones:
-            if '7ffb14f4cfec04ddaca6ed515707f9108b20b327' in phone['string']:
+        for line in lines[4:]:
+            if 'iPhone' in line:
                 miki_phone_present_tmp = True
-            else:
+            elif len(line) > 0:
                 other_phone_present_tmp = True
         miki_phone_present = miki_phone_present_tmp
         other_phone_present = other_phone_present_tmp
